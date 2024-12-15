@@ -1,7 +1,9 @@
 CXX = g++
 CXXFLAGS = -std=c++11
 
-SRCS = main.cpp Dealer/dealer.cpp
+SRCS = main.cpp 
+SRCS += Dealer\dealer.cpp
+SRCS += commonTypes.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 TARGET = PokerBot
@@ -12,6 +14,5 @@ $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
 
 clean:
-	del main.o
-	del dealer.o
+	del $(OBJS)
 	del PokerBot.exe

@@ -1,11 +1,14 @@
 #pragma once
 
+#include <string>
+
 enum Suit {
     Diamonds,
     Hearts,
     Clubs,
     Spades
 };
+std::string toStrSuit(Suit suit);
 
 enum Value {
     Ace,
@@ -22,8 +25,10 @@ enum Value {
     Queen,
     King
 };
+std::string toStrValue(Value value);
 
 struct Card {
-    const Suit suit;
-    const Value value;
+    Suit suit;
+    Value value;
 };
+std::string toStrCard(Card card);

@@ -5,11 +5,11 @@
 class Dealer {
 public:
     Dealer();
-    ~Dealer() = default;
+    ~Dealer();
 
 private:
     void initDeck();
     void shuffleDeck();
 
-    const Card *deck;
+    Card *deck;
 };
