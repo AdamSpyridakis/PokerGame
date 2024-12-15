@@ -1,12 +1,13 @@
 #include "../commonTypes.hpp"
 
+#pragma once
+
 class Dealer {
+public:
     Dealer();
     ~Dealer() = default;
 
-    public:
-
-    private:
+private:
     void initDeck();
     void shuffleDeck();
 

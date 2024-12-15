@@ -1,3 +1,5 @@
+#pragma once
+
 enum Suit {
     Diamonds,
     Hearts,
