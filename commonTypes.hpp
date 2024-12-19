@@ -32,3 +32,9 @@ struct Card {
     Value value;
 };
 std::string toStrCard(Card card);
+
+struct Hand {
+    Card firstCard;
+    Card secondCard;
+};
+std::string toStrHand(Hand hand);

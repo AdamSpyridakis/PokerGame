@@ -1,6 +1,6 @@
-#include "Dealer/dealer.hpp"
+#include "GameLogic/GameLogic.hpp"
 
 int main() {
-    Dealer test;
+    GameLogic Test(3);
     return 0;
 }

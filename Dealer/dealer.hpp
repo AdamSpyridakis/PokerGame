@@ -1,4 +1,6 @@
 #include "../commonTypes.hpp"
+#include "../Player/Player.hpp"
+#include <random>
 
 #pragma once
 
@@ -7,9 +9,12 @@ public:
     Dealer();
     ~Dealer();
 
+    void dealPlayerHand(Player *player);
+
 private:
     void initDeck();
     void shuffleDeck();
 
-    Card *deck;
+    Card *m_deck;
+    int deckIndex;
 };

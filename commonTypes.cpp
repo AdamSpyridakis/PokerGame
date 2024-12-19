@@ -1,5 +1,4 @@
 #include "commonTypes.hpp"
-#include <string>
 
 std::string toStrSuit(Suit suit) {
     switch (suit) {
@@ -47,4 +46,8 @@ std::string toStrValue(Value value) {
 
 std::string toStrCard(Card card) {
     return toStrValue(card.value) + " of " + toStrSuit(card.suit);
+}
+
+std::string toStrHand(Hand hand) {
+    return toStrCard(hand.firstCard) + " and " + toStrCard(hand.secondCard);
 }
