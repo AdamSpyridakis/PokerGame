@@ -1,6 +1,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+const int startingStack = 1000;
+const int smallBlind = 1;
+const int bigBlind = 2;
 
 enum Suit {
     Diamonds,

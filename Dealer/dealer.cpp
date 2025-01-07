@@ -9,10 +9,10 @@ Dealer::~Dealer() {
     delete[] m_deck;
 }
 
-void Dealer::dealPlayerHand(Player *player) {
-    Hand playerHand = {m_deck[deckIndex], m_deck[deckIndex+1]};
+Hand Dealer::dealPlayerHand() {
+    Hand playerHand = {m_deck[deckIndex], m_deck[deckIndex + 1]};
     deckIndex+=2;
-    player->setPlayerHand(playerHand);
+    return playerHand;
 }
 
 void Dealer::initDeck() {

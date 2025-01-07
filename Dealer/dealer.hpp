@@ -1,15 +1,15 @@
+#pragma once
+
 #include "../commonTypes.hpp"
 #include "../Player/Player.hpp"
 #include <random>
-
-#pragma once
 
 class Dealer {
 public:
     Dealer();
     ~Dealer();
 
-    void dealPlayerHand(Player *player);
+    Hand dealPlayerHand();
 
 private:
     void initDeck();
