@@ -4,8 +4,6 @@
 #include <vector>
 
 const int startingStack = 1000;
-const int smallBlind = 1;
-const int bigBlind = 2;
 
 enum Suit {
     Diamonds,
@@ -13,7 +11,6 @@ enum Suit {
     Clubs,
     Spades
 };
-std::string toStrSuit(Suit suit);
 
 enum Value {
     Ace,
@@ -30,16 +27,20 @@ enum Value {
     Queen,
     King
 };
-std::string toStrValue(Value value);
 
 struct Card {
     Suit suit;
     Value value;
 };
-std::string toStrCard(Card card);
 
 struct Hand {
     Card firstCard;
     Card secondCard;
 };
+
+#ifdef CONSOLE_PRINT
+std::string toStrSuit(Suit suit);
+std::string toStrValue(Value value);
+std::string toStrCard(Card card);
 std::string toStrHand(Hand hand);
+#endif

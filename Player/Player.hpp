@@ -4,25 +4,18 @@
 #include <iostream>
 
 class Player {
-public:
-    Player();
-    ~Player() = default;
-
-    void setPlayerName();
-
-    void setPlayerHand(Hand playerHand);
-    Hand getPlayerHand();
-
-    int getContribution();
-
-    bool getFoldStatus();
-
-    int takeBets(int amount);
-
 private:
+    Player(int playerIndex);
+
+    bool takeBets(int amount);
+
+    Player *m_nextPlayer;
+    int m_playerIndex;
     std::string m_playerName;
-    int m_stack;
+    int m_stack = startingStack;
     int m_contributionToCurrentHand;
     Hand m_playerHand;
-    bool m_isFolded;
+    bool m_isFolded = false;
+
+    friend class GameLogic;
 };

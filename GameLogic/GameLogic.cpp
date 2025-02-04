@@ -4,12 +4,10 @@ GameLogic::GameLogic(int numPlayers) {
     m_dealer = new Dealer;
 
     for (int i = 0; i < numPlayers; ++i) {
-        m_players.push_back(new Player);
+        m_players.push_back(new Player(i));
     }
+    setupLinkedList();
     m_numPlayers = numPlayers;
-    for (auto player : m_players) {
-        player->setPlayerName();
-    }
 
     maxPot = startingStack * m_numPlayers;
 
@@ -26,8 +24,17 @@ GameLogic::~GameLogic() {
     }
 }
 
+void GameLogic::setupLinkedList() {
+    for (int i = 0; i < m_numPlayers; ++i) {
+    }
+}
+
 void GameLogic::startGame() {
     dealPlayerHands();
+
+#ifdef CONSOLE_PRINT
+    printPlayers();
+#endif
 
     takeInitialBets();
 
@@ -38,7 +45,7 @@ void GameLogic::startGame() {
 
 void GameLogic::dealPlayerHands() {
     for (int i = 0; i < m_numPlayers; ++i) {
-        m_players[i]->setPlayerHand(m_dealer->dealPlayerHand());
+        m_players[i]->m_playerHand = m_dealer->dealPlayerHand();
     }
 }
 
@@ -67,30 +74,58 @@ void GameLogic::beginBetting() {
 }
 
 void GameLogic::updatePot(int betAmount, Player *player) {
-    int actualBet = player->takeBets(betAmount);
+    bool allIn = player->takeBets(betAmount);
 
-    /* In the case that a side pot must be made, the expected amount will be greater than what the player put in.
-       For example a player calls when the bet is more than the amount of chips they have. */
-    if (betAmount > actualBet) {
-        updateSidePots(betAmount, player);
+    if (allIn) {
+        updateSidePots(player);
+    } 
+    
+    // Recalculate pot values
+    int lastMaxPotValue = 0;
+
+    for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {
+        it->amount = 0;
+        it->players = std::vector<Player *>{};
+        for (int i = 0; i < m_numPlayers; ++i) {
+            bool contributedToPot = false;
+            if (m_players[i]->m_contributionToCurrentHand >= it->maxBet) {
+                it->amount += it->maxBet - lastMaxPotValue;
+                contributedToPot = true;
+            } else if (m_players[i]->m_contributionToCurrentHand < it->maxBet && m_players[i]->m_contributionToCurrentHand > lastMaxPotValue) {
+                it->amount += m_players[i]->m_contributionToCurrentHand - lastMaxPotValue;
+                contributedToPot = true;
+            }
+
+            if (!m_players[i]->m_isFolded && contributedToPot) {
+                it->players.push_back(m_players[i]);
+            }
+        }
+        lastMaxPotValue = it->maxBet;
     }
-
-
 }
 
-void GameLogic::updateSidePots(int betAmount, Player *player) {
+void GameLogic::updateSidePots(Player *player) {
     // The new side pot max bet will equal the contribution of the player that went all in.
-    int maxBetNewSidePot = player->getContribution();
+    int maxBetNewSidePot = player->m_contributionToCurrentHand;
 
     // Pots are ordered by size of max bet
     for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {
         if (it->maxBet == maxBetNewSidePot) {
             // We already have a side pot of this size
             break;
-        } else if (it->maxBet > player->getContribution()) {
-            // Make a new pot, amount will be calculated after
-            Pot newPot = {0, player->getContribution(), it->players};
+        } else if (it->maxBet > maxBetNewSidePot) {
+            // Make a new pot, amount and players will be calculated after
+            Pot newPot = {0, maxBetNewSidePot, };
             m_pot.insert(it, newPot);
         }
     }
 }
+
+#ifdef CONSOLE_PRINT
+void GameLogic::printPlayers() {
+    for (auto player : m_players) {
+        std::cout << player->m_playerName << "\n";
+        std::cout << toStrHand(player->m_playerHand) << "\n\n";
+    }
+}
+#endif

@@ -2,6 +2,7 @@
 
 #include "../Player/Player.hpp"
 #include "../Dealer/Dealer.hpp"
+
 #include <vector>
 
 struct Pot {
@@ -17,12 +18,13 @@ public:
 
 private:
     void startGame();
+    void setupLinkedList();
     void dealPlayerHands();
     void takeInitialBets();
     void beginBetting();
 
     void updatePot(int betAmount, Player *player);
-    void updateSidePots(int betAmount, Player *player);
+    void updateSidePots(Player *player);
 
     Dealer *m_dealer;
     std::vector<Player *> m_players;
@@ -31,4 +33,11 @@ private:
 
     std::vector<Pot> m_pot;
     int maxPot;
+
+    int smallBlind = 1;
+    int bigBlind = 2;
+
+#ifdef CONSOLE_PRINT
+    void printPlayers();
+#endif
 };
