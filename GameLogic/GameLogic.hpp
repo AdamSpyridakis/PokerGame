@@ -38,4 +38,5 @@ private:
     int bigBlind = 2;
 
     void printPlayers();
+    void printPot();
 };

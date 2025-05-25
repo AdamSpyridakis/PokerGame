@@ -59,6 +59,8 @@ void GameLogic::startGame() {
 
     takeInitialBets();
 
+    printPot();
+
     // pre-flop betting
     beginBetting();
 
@@ -143,5 +145,17 @@ void GameLogic::printPlayers() {
     for (auto player : m_players) {
         std::cout << player->m_playerName << " " << player->m_stack << "\n";
         std::cout << toStrHand(player->m_playerHand) << "\n\n";
+    }
+}
+
+void GameLogic::printPot() {
+    for (auto pots : m_pot) {
+        std::cout << "Max bet: " << pots.maxBet << "\n";
+        std::cout << "Amount: " << pots.amount << "\n";
+        std::cout << "Players Included: ";
+        for (auto players : pots.players) {
+            std::cout << players->m_playerName << " ";
+        }
+        std::cout << "\n\n";
     }
 }

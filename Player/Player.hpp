@@ -15,7 +15,7 @@ private:
     int m_playerIndex;
     std::string m_playerName;
     int m_stack = startingStack;
-    int m_contributionToCurrentHand;
+    int m_contributionToCurrentHand = 0;
     Hand m_playerHand;
     bool m_isFolded = false;
 };
