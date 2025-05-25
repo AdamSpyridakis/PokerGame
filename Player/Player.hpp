@@ -8,6 +8,7 @@ private:
     Player(int playerIndex);
 
     bool takeBets(int amount);
+    int pollPlayer(int amountToCall);
 
     Player *m_nextPlayer;
     int m_playerIndex;

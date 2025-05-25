@@ -1,6 +1,5 @@
 #include "commonTypes.hpp"
 
-#ifdef CONSOLE_PRINT
 std::string toStrSuit(Suit suit) {
     switch (suit) {
         case (Diamonds):
@@ -52,4 +51,3 @@ std::string toStrCard(Card card) {
 std::string toStrHand(Hand hand) {
     return toStrCard(hand.firstCard) + " and " + toStrCard(hand.secondCard);
 }
-#endif

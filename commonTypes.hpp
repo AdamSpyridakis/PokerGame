@@ -38,9 +38,7 @@ struct Hand {
     Card secondCard;
 };
 
-#ifdef CONSOLE_PRINT
 std::string toStrSuit(Suit suit);
 std::string toStrValue(Value value);
 std::string toStrCard(Card card);
 std::string toStrHand(Hand hand);
-#endif

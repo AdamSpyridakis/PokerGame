@@ -29,7 +29,7 @@ private:
     Dealer *m_dealer;
     std::vector<Player *> m_players;
     int m_numPlayers;
-    int m_buttonPlayer;
+    Player *m_buttonPlayer;
 
     std::vector<Pot> m_pot;
     int maxPot;
@@ -37,7 +37,5 @@ private:
     int smallBlind = 1;
     int bigBlind = 2;
 
-#ifdef CONSOLE_PRINT
     void printPlayers();
-#endif
 };

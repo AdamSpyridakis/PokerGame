@@ -6,12 +6,11 @@ GameLogic::GameLogic(int numPlayers) {
     for (int i = 0; i < numPlayers; ++i) {
         m_players.push_back(new Player(i));
     }
-    setupLinkedList();
     m_numPlayers = numPlayers;
 
     maxPot = startingStack * m_numPlayers;
 
-    m_buttonPlayer = 0;
+    m_buttonPlayer = m_players[0];
 
     startGame();
 }
@@ -25,16 +24,38 @@ GameLogic::~GameLogic() {
 }
 
 void GameLogic::setupLinkedList() {
-    for (int i = 0; i < m_numPlayers; ++i) {
+    /* As the game goes, players will be eliminated.
+       Need to determine who is in to setup turn order */
+    int firstPlayerIndex = 0;
+    int lastPlayerIndex = 0;
+
+    // Find first player still in.
+    for (int i = 0; i < m_numPlayers - 1; ++i) {
+        if (m_players[i]->m_stack > 0) {
+            firstPlayerIndex = i;
+            break;
+        }
     }
+
+    // Setup linked list.
+    for (int i = firstPlayerIndex; i < m_numPlayers - 1; ++i) {
+        if (m_players[i + 1]->m_stack > 0) {
+            m_players[i]->m_nextPlayer = m_players[i + 1];
+            lastPlayerIndex = i + 1;
+        }
+    }
+
+    // Loop back around!
+    m_players[lastPlayerIndex]->m_nextPlayer = m_players[firstPlayerIndex];
 }
 
 void GameLogic::startGame() {
+    // Linked list for turn order - players involved in a hand
+    setupLinkedList();
+
     dealPlayerHands();
 
-#ifdef CONSOLE_PRINT
     printPlayers();
-#endif
 
     takeInitialBets();
 
@@ -54,22 +75,15 @@ void GameLogic::takeInitialBets() {
        Initial pot has no limit and no players involved in it. */
     m_pot.push_back({0, maxPot, std::vector<Player *>{}});
 
-    int smallBlindPlayer = m_buttonPlayer + 1;
-    int bigBlindPlayer = m_buttonPlayer + 2;
+    Player *smallBlindPlayer = m_buttonPlayer->m_nextPlayer;
+    Player *bigBlindPlayer = smallBlindPlayer->m_nextPlayer;
 
-    if (m_buttonPlayer == m_numPlayers - 1) {
-        smallBlindPlayer -= m_numPlayers;
-    } 
-
-    if (smallBlindPlayer == m_numPlayers - 1) {
-        bigBlindPlayer -= m_numPlayers;
-    }
-
-    updatePot(smallBlind, m_players[smallBlindPlayer]);
-
+    updatePot(smallBlind, smallBlindPlayer);
+    updatePot(bigBlind, bigBlindPlayer);
 }
 
 void GameLogic::beginBetting() {
+    Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer->m_nextPlayer;
 
 }
 
@@ -121,11 +135,9 @@ void GameLogic::updateSidePots(Player *player) {
     }
 }
 
-#ifdef CONSOLE_PRINT
 void GameLogic::printPlayers() {
     for (auto player : m_players) {
-        std::cout << player->m_playerName << "\n";
+        std::cout << player->m_playerName << " " << player->m_stack << "\n";
         std::cout << toStrHand(player->m_playerHand) << "\n\n";
     }
 }
-#endif
