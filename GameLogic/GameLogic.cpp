@@ -78,8 +78,8 @@ void GameLogic::takeInitialBets() {
     Player *smallBlindPlayer = m_buttonPlayer->m_nextPlayer;
     Player *bigBlindPlayer = smallBlindPlayer->m_nextPlayer;
 
-    updatePot(smallBlind, smallBlindPlayer);
-    updatePot(bigBlind, bigBlindPlayer);
+    updatePot(smallBlind, smallBlindPlayer, true);
+    updatePot(bigBlind, bigBlindPlayer, true);
 }
 
 void GameLogic::beginBetting() {
@@ -87,14 +87,18 @@ void GameLogic::beginBetting() {
 
 }
 
-void GameLogic::updatePot(int betAmount, Player *player) {
-    bool allIn = player->takeBets(betAmount);
+void GameLogic::updatePot(int betAmount, Player *player, bool isForced) {
+    /* Send player betAmount (amount to call/blind amount).
+       Returned value determines whether a new side pot needs to be made. */ 
+    bool allIn = player->takeBets(betAmount, isForced);
 
     if (allIn) {
         updateSidePots(player);
     } 
     
-    // Recalculate pot values
+    /* Figuring out pot values when there are a bunch of side pots
+       is kind of a pain. There are a lot of edge cases. It is much
+       easier to just recalculate the pots after each bet. */
     int lastMaxPotValue = 0;
 
     for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {

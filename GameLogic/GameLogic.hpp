@@ -23,7 +23,7 @@ private:
     void takeInitialBets();
     void beginBetting();
 
-    void updatePot(int betAmount, Player *player);
+    void updatePot(int betAmount, Player *player, bool isForced);
     void updateSidePots(Player *player);
 
     Dealer *m_dealer;

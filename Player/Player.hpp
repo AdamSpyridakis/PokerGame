@@ -4,10 +4,11 @@
 #include <iostream>
 
 class Player {
+    friend class GameLogic;
 private:
     Player(int playerIndex);
 
-    bool takeBets(int amount);
+    bool takeBets(int amount, bool isForced);
     int pollPlayer(int amountToCall);
 
     Player *m_nextPlayer;
@@ -17,6 +18,4 @@ private:
     int m_contributionToCurrentHand;
     Hand m_playerHand;
     bool m_isFolded = false;
-
-    friend class GameLogic;
 };
