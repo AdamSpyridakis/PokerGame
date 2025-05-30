@@ -12,9 +12,8 @@ enum ActionType {
 };
 
 class Player {
-    friend class GameLogic;
-private:
-    Player(int playerIndex);
+public:
+    Player(int playerIndex, CommonVariables *variables);
 
     bool takeBets(int amount, bool isForced);
     int pollPlayer(int amountToCall);
@@ -27,4 +26,7 @@ private:
     int m_contributionToCurrentHand = 0;
     Hand m_playerHand;
     bool m_isFolded = false;
+
+private:
+    CommonVariables *m_variables;
 };

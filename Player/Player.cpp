@@ -1,9 +1,11 @@
 #include "Player.hpp"
 
-Player::Player(int playerIndex) {
+Player::Player(int playerIndex, CommonVariables *variables) {
     m_playerIndex = playerIndex;
     std::cout << "Player " << m_playerIndex << ". Enter your name: ";
     std::cin >> m_playerName;
+
+    m_variables = variables;
 }
 
 bool Player::takeBets(int amount, bool isForced) {

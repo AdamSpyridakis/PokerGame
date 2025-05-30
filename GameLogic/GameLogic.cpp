@@ -3,8 +3,10 @@
 GameLogic::GameLogic(int numPlayers) {
     m_dealer = new Dealer;
 
+    m_variables = new CommonVariables;
+
     for (int i = 0; i < numPlayers; ++i) {
-        m_players.push_back(new Player(i));
+        m_players.push_back(new Player(i, m_variables));
     }
     m_numPlayers = numPlayers;
 
