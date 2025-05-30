@@ -80,8 +80,8 @@ void GameLogic::takeInitialBets() {
     Player *smallBlindPlayer = m_buttonPlayer->m_nextPlayer;
     Player *bigBlindPlayer = smallBlindPlayer->m_nextPlayer;
 
-    updatePot(smallBlind, smallBlindPlayer, true);
-    updatePot(bigBlind, bigBlindPlayer, true);
+    updatePot(m_smallBlind, smallBlindPlayer, true);
+    updatePot(m_bigBlind, bigBlindPlayer, true);
 }
 
 void GameLogic::beginBetting() {

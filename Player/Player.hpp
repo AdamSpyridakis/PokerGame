@@ -1,7 +1,15 @@
 #pragma once
 
-#include "../commonTypes.hpp"
+#include "../Common/CommonTypes.hpp"
 #include <iostream>
+
+enum ActionType {
+    Call,
+    Raise,
+    Fold,
+    Check,
+    Invalid
+};
 
 class Player {
     friend class GameLogic;
@@ -10,6 +18,7 @@ private:
 
     bool takeBets(int amount, bool isForced);
     int pollPlayer(int amountToCall);
+    ActionType getActionType(std::string input);
 
     Player *m_nextPlayer;
     int m_playerIndex;

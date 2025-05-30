@@ -31,19 +31,44 @@ int Player::pollPlayer(int amountToCall) {
     while (true) {
         std::string input;
         std::cin >> input;
-        if (input == "C") {
-            return amountToCall;
-        } else if (input == "R"){
-            int raiseAmount;
-            std::cin >> raiseAmount;
-            /* Throw an error if the amount to be called + the raise amount is bigger
-               than the player's stack. */
-            if (raiseAmount + amountToCall > m_stack) {
-                std::cout << "error message";
-                continue;
-            } else {
-                return raiseAmount + amountToCall;
-            }
+        ActionType action = getActionType(input);
+        switch (action) {
+            case Call:
+                return amountToCall;
+            case Raise:
+                int raiseAmount;
+                std::cin >> raiseAmount;
+                /* Throw an error if the amount to be called + the raise amount is bigger
+                than the player's stack. */
+                if (raiseAmount + amountToCall > m_stack) {
+                    std::cout << "error message";
+                    break;
+                } else {
+                    return raiseAmount + amountToCall;
+                }
+            case Fold:
+                m_isFolded = true;
+                return 0;
+            case Check:
+                if (amountToCall != 0) {
+                    std::cout << "error message";
+                }
+            case Invalid:
+                break;
         }
-    }     
+    }
+}
+
+ActionType Player::getActionType(std::string input) {
+    if (input == "call") {
+        return Call;
+    } else if (input == "raise") {
+        return Raise;
+    } else if (input == "fold") {
+        return Fold;
+    } else if (input == "check") {
+        return Check;
+    } else {
+        return Invalid;
+    }
 }

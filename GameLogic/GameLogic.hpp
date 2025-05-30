@@ -34,8 +34,9 @@ private:
     std::vector<Pot> m_pot;
     int maxPot;
 
-    int smallBlind = 1;
-    int bigBlind = 2;
+    int m_bigBlind = 2;
+    int m_smallBlind = 1;
+    int m_minimumRaise = m_bigBlind;
 
     void printPlayers();
     void printPot();

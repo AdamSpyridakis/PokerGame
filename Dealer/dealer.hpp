@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../commonTypes.hpp"
+#include "../Common/commonTypes.hpp"
 #include "../Player/Player.hpp"
 #include <random>
 
