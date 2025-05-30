@@ -6,8 +6,8 @@
 #include <vector>
 
 struct Pot {
-    int amount;
-    int maxBet;
+    unsigned int amount;
+    unsigned int maxBet;
     std::vector<Player *> players;
 };
 
@@ -23,7 +23,7 @@ private:
     void takeInitialBets();
     void beginBetting();
 
-    void updatePot(int betAmount, Player *player, bool isForced);
+    void updatePot(unsigned int betAmount, Player *player, bool isForced);
     void updateSidePots(Player *player);
 
     Dealer *m_dealer;
@@ -32,12 +32,12 @@ private:
     Player *m_buttonPlayer;
 
     std::vector<Pot> m_pot;
-    int maxPot;
+    unsigned int maxPot;
 
     CommonVariables *m_variables;
-    int m_bigBlind = startingBigBlind;
-    int m_smallBlind = startingSmallBlind;
-    int m_minimumRaise = m_bigBlind;
+    unsigned int m_bigBlind = startingBigBlind;
+    unsigned int m_smallBlind = startingSmallBlind;
+    unsigned int m_minimumRaise = m_bigBlind;
 
     void printPlayers();
     void printPot();

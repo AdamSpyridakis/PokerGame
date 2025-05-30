@@ -91,7 +91,7 @@ void GameLogic::beginBetting() {
 
 }
 
-void GameLogic::updatePot(int betAmount, Player *player, bool isForced) {
+void GameLogic::updatePot(unsigned int betAmount, Player *player, bool isForced) {
     /* Send player betAmount (amount to call/blind amount).
        Returned value determines whether a new side pot needs to be made. */ 
     bool allIn = player->takeBets(betAmount, isForced);
@@ -103,7 +103,7 @@ void GameLogic::updatePot(int betAmount, Player *player, bool isForced) {
     /* Figuring out pot values when there are a bunch of side pots
        is kind of a pain. There are a lot of edge cases. It is much
        easier to just recalculate the pots after each bet. */
-    int lastMaxPotValue = 0;
+    unsigned int lastMaxPotValue = 0;
 
     for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {
         it->amount = 0;
@@ -128,7 +128,7 @@ void GameLogic::updatePot(int betAmount, Player *player, bool isForced) {
 
 void GameLogic::updateSidePots(Player *player) {
     // The new side pot max bet will equal the contribution of the player that went all in.
-    int maxBetNewSidePot = player->m_contributionToCurrentHand;
+    unsigned int maxBetNewSidePot = player->m_contributionToCurrentHand;
 
     // Pots are ordered by size of max bet
     for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {

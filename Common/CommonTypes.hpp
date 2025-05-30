@@ -3,13 +3,13 @@
 #include <string>
 #include <vector>
 
-const int startingStack = 1000;
-const int startingBigBlind = 2;
-const int startingSmallBlind = 1;
+const unsigned int startingStack = 1000;
+const unsigned int startingBigBlind = 2;
+const unsigned int startingSmallBlind = 1;
 
 struct CommonVariables
 {
-    int minimumRaiseAmount;
+    unsigned int minimumRaiseAmount;
 };
 
 enum Suit {
