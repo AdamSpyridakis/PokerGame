@@ -39,9 +39,13 @@ void GameLogic::setupLinkedList() {
         }
     }
 
+    // Keep track of players
+    m_playersInHand = 1;
+
     // Setup linked list.
     for (int i = firstPlayerIndex; i < m_numPlayers - 1; ++i) {
         if (m_players[i + 1]->m_stack > 0) {
+            m_playersInHand++;
             m_players[i]->m_nextPlayer = m_players[i + 1];
             lastPlayerIndex = i + 1;
         }
@@ -88,7 +92,6 @@ void GameLogic::takeInitialBets() {
 
 void GameLogic::beginBetting() {
     Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer->m_nextPlayer;
-
 }
 
 void GameLogic::updatePot(unsigned int betAmount, Player *player, bool isForced) {

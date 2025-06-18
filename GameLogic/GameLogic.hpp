@@ -38,6 +38,7 @@ private:
     unsigned int m_bigBlind = startingBigBlind;
     unsigned int m_smallBlind = startingSmallBlind;
     unsigned int m_minimumRaise = m_bigBlind;
+    int m_playersInHand;
 
     void printPlayers();
     void printPot();

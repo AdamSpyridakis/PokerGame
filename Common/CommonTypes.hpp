@@ -7,9 +7,17 @@ const unsigned int startingStack = 1000;
 const unsigned int startingBigBlind = 2;
 const unsigned int startingSmallBlind = 1;
 
-struct CommonVariables
-{
+struct CommonVariables {
     unsigned int minimumRaiseAmount;
+};
+
+enum ActionType {
+    Call,
+    Raise,
+    AllIn,
+    Fold,
+    Check,
+    Blind
 };
 
 enum Suit {

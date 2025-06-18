@@ -3,22 +3,22 @@
 #include "../Common/CommonTypes.hpp"
 #include <iostream>
 
-enum ActionType {
-    Call,
-    Raise,
-    AllIn,
-    Fold,
-    Check,
-    Invalid
+struct PlayerAction {
+    ActionType action;
+    unsigned int betAmount;
+};
+
+struct ValidActions {
+    bool canCall;
+    bool canRaise;
+    bool canCheck;
 };
 
 class Player {
 public:
     Player(int playerIndex, CommonVariables *variables);
 
-    bool takeBets(unsigned int amount, bool isForced);
-    unsigned int pollPlayer(unsigned int amountToCall);
-    ActionType getActionType(std::string input);
+    ActionType takeBets(unsigned int amount, bool isForced);
 
     Player *m_nextPlayer;
     int m_playerIndex;
@@ -29,5 +29,9 @@ public:
     bool m_isFolded = false;
 
 private:
+    ValidActions getValidActions(unsigned int amountToCall);
+    void printValidActions(ValidActions valid, unsigned int amountToCall);
+    PlayerAction pollPlayer(unsigned int amountToCall);
+    ActionType getActionType(std::string input, ValidActions valid);
     CommonVariables *m_variables;
 };

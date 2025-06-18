@@ -10,6 +10,8 @@ std::string toStrSuit(Suit suit) {
             return "Clubs";
         case (Spades):
             return "Spades";
+        default:
+            return "";
     };
 }
 
@@ -41,6 +43,8 @@ std::string toStrValue(Value value) {
             return "Queen";
         case (King):
             return "King";
+        default:
+            return "";
     };
 }
 
