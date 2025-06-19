@@ -64,7 +64,7 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
                 } else {
                     returnVal.action = ActionType::Raise;
                     returnVal.betAmount = raiseAmount + amountToCall;
-                    m_variables->minimumRaiseAmount = returnVal.betAmount;
+                    m_variables->minimumRaiseAmount = raiseAmount;
                     return returnVal;
                 }
             // AllIn is not a handled action by the game logic, only an option for players.

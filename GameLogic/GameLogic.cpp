@@ -104,7 +104,7 @@ void GameLogic::startBettingRound() {
             currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
             continue;
         }
-        maximumCallAmount = takeBet(maximumCallAmount - currentBettingPlayer->m_contributionToCurrentHand, currentBettingPlayer);
+        maximumCallAmount = takeBet(maximumCallAmount, currentBettingPlayer);
         currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
     }
 }
@@ -117,9 +117,8 @@ void GameLogic::takeBlind(unsigned int blindAmount, Player *player) {
     recalculatePot();
 }
 
-unsigned int GameLogic::takeBet(unsigned int amountToCall, Player *player) {
-    int newAmountToCall = amountToCall;
-
+unsigned int GameLogic::takeBet(unsigned int maxCallAmount, Player *player) {
+    int amountToCall = maxCallAmount - player->m_contributionToBettingRound;
     ActionType action = player->takeBet(amountToCall);
     switch(action) {
         case ActionType::Call:
@@ -133,7 +132,7 @@ unsigned int GameLogic::takeBet(unsigned int amountToCall, Player *player) {
             m_playersActionComplete = 1;
             /* If a player made a valid raise, this will be the new call amount
                for other players. */
-            newAmountToCall = player->m_contributionToBettingRound;
+            maxCallAmount = player->m_contributionToBettingRound;
             break;
         default:
             std::cout << "shouldn't get here.....";
@@ -145,7 +144,7 @@ unsigned int GameLogic::takeBet(unsigned int amountToCall, Player *player) {
     }
     recalculatePot();
 
-    return newAmountToCall;
+    return maxCallAmount;
 }
 
 void GameLogic::recalculatePot() {

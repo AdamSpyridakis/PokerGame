@@ -25,7 +25,7 @@ private:
 
     void recalculatePot();
     void takeBlind(unsigned int blindAmount, Player *player);
-    unsigned int takeBet(unsigned int amountToCall, Player *player);
+    unsigned int takeBet(unsigned int maxCallAmount, Player *player);
     void updateSidePots(Player *player);
 
     Dealer *m_dealer;
