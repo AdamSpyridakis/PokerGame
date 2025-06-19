@@ -68,8 +68,10 @@ void GameLogic::startGame() {
     printPot();
 
     // pre-flop betting
-    beginBetting();
+    startBettingRound();
 
+    printPot();
+    printPlayers();
 }
 
 void GameLogic::dealPlayerHands() {
@@ -91,24 +93,35 @@ void GameLogic::takeInitialBets() {
     m_variables->minimumRaiseAmount = m_bigBlind;
 }
 
-void GameLogic::beginBetting() {
-    Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer->m_nextPlayer;
-    m_playersActionComplete = 1;
-    while (m_playersActionComplete <= m_playersInHand) {
+void GameLogic::startBettingRound() {
+    // Keeps track of maximum call amount (if someone has put in nothing)
+    unsigned int maximumCallAmount = m_bigBlind;
 
+    Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer->m_nextPlayer->m_nextPlayer;
+    m_playersActionComplete = 1;
+    while (m_playersActionComplete != m_playersInHand) {
+        if(currentBettingPlayer->m_isFolded) {
+            currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
+            continue;
+        }
+        maximumCallAmount = takeBet(maximumCallAmount - currentBettingPlayer->m_contributionToCurrentHand, currentBettingPlayer);
+        currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
     }
 }
 
-void GameLogic::takeBlind(unsigned int betAmount, Player *player) {
+void GameLogic::takeBlind(unsigned int blindAmount, Player *player) {
     // Returned value determines whether a new side pot needs to be made.
-    if (player->takeBlind(betAmount) == ActionType::AllIn) {
+    if (player->takeBlind(blindAmount) == ActionType::AllIn) {
         updateSidePots(player);
     }
     recalculatePot();
 }
 
-void GameLogic::takeBet(unsigned int betAmount, Player *player) {
-    switch(player->takeBet(betAmount)) {
+unsigned int GameLogic::takeBet(unsigned int amountToCall, Player *player) {
+    int newAmountToCall = amountToCall;
+
+    ActionType action = player->takeBet(amountToCall);
+    switch(action) {
         case ActionType::Call:
         case ActionType::Check:
             m_playersActionComplete++;
@@ -118,16 +131,21 @@ void GameLogic::takeBet(unsigned int betAmount, Player *player) {
             break;
         case ActionType::Raise:
             m_playersActionComplete = 1;
+            /* If a player made a valid raise, this will be the new call amount
+               for other players. */
+            newAmountToCall = player->m_contributionToBettingRound;
             break;
         default:
-            std::cout << "?!";
-            return;
+            std::cout << "shouldn't get here.....";
+            return 0;
     }
 
     if (player->m_stack == 0) {
         updateSidePots(player);
     }
     recalculatePot();
+
+    return newAmountToCall;
 }
 
 void GameLogic::recalculatePot() {

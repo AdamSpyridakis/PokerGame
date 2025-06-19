@@ -29,6 +29,8 @@ public:
     Hand m_playerHand;
     bool m_isFolded = false;
 
+    unsigned int m_contributionToBettingRound = 0;
+
 private:
     ValidActions getValidActions(unsigned int amountToCall);
     void printValidActions(ValidActions valid, unsigned int amountToCall);

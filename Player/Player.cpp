@@ -11,11 +11,13 @@ Player::Player(int playerIndex, CommonVariables *variables) {
 ActionType Player::takeBlind(unsigned int amount) {
     if (amount >= m_stack) {
         m_contributionToCurrentHand += m_stack;
+        m_contributionToBettingRound += m_stack;
         m_stack = 0;
         return ActionType::AllIn;
     }
 
     m_contributionToCurrentHand += amount;
+    m_contributionToBettingRound += amount;
     m_stack -= amount;
     return ActionType::Blind;
 }
@@ -25,16 +27,16 @@ ActionType Player::takeBet(unsigned int amountToCall) {
     action = pollPlayer(amountToCall);
 
     m_contributionToCurrentHand += action.betAmount;
+    m_contributionToBettingRound += action.betAmount;
     m_stack -= action.betAmount;
     return action.action;
 }
 
-
 PlayerAction Player::pollPlayer(unsigned int amountToCall) {
     ValidActions valid = getValidActions(amountToCall);
-    printValidActions(valid, amountToCall);
     PlayerAction returnVal = {};
     while (true) {
+        printValidActions(valid, amountToCall);
         std::string input;
         std::cin >> input;
         ActionType action = getActionType(input, valid);
@@ -106,6 +108,7 @@ ValidActions Player::getValidActions(unsigned int amountToCall) {
 }
 
 void Player::printValidActions(ValidActions valid, unsigned int amountToCall) {
+    std::cout << "Player " << m_playerIndex << " your action!\n";
     std::cout << "Type fold to fold.\n";
     std::cout << "Type allIn to go all in.\n";
     if (valid.canCall) {

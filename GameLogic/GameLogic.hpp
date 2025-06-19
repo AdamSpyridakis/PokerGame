@@ -21,11 +21,11 @@ private:
     void setupLinkedList();
     void dealPlayerHands();
     void takeInitialBets();
-    void beginBetting();
+    void startBettingRound();
 
     void recalculatePot();
-    void takeBlind(unsigned int betAmount, Player *player);
-    void takeBet(unsigned int betAmount, Player *player);
+    void takeBlind(unsigned int blindAmount, Player *player);
+    unsigned int takeBet(unsigned int amountToCall, Player *player);
     void updateSidePots(Player *player);
 
     Dealer *m_dealer;
