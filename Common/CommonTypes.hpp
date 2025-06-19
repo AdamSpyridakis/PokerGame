@@ -11,7 +11,7 @@ struct CommonVariables {
     unsigned int minimumRaiseAmount;
 };
 
-enum ActionType {
+enum class ActionType {
     Call,
     Raise,
     AllIn,

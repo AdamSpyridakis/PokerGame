@@ -10,7 +10,7 @@ GameLogic::GameLogic(int numPlayers) {
     }
     m_numPlayers = numPlayers;
 
-    maxPot = startingStack * m_numPlayers;
+    m_maxPot = startingStack * m_numPlayers;
 
     m_buttonPlayer = m_players[0];
 
@@ -81,29 +81,57 @@ void GameLogic::dealPlayerHands() {
 void GameLogic::takeInitialBets() {
     /* Have a vector of pots in case someone goes all in and a side pot is needed.
        Initial pot has no limit and no players involved in it. */
-    m_pot.push_back({0, maxPot, std::vector<Player *>{}});
+    m_pot.push_back({0, m_maxPot, std::vector<Player *>{}});
 
     Player *smallBlindPlayer = m_buttonPlayer->m_nextPlayer;
     Player *bigBlindPlayer = smallBlindPlayer->m_nextPlayer;
 
-    updatePot(m_smallBlind, smallBlindPlayer, true);
-    updatePot(m_bigBlind, bigBlindPlayer, true);
+    takeBlind(m_smallBlind, smallBlindPlayer);
+    takeBlind(m_bigBlind, bigBlindPlayer);
+    m_variables->minimumRaiseAmount = m_bigBlind;
 }
 
 void GameLogic::beginBetting() {
     Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer->m_nextPlayer;
+    m_playersActionComplete = 1;
+    while (m_playersActionComplete <= m_playersInHand) {
+
+    }
 }
 
-void GameLogic::updatePot(unsigned int betAmount, Player *player, bool isForced) {
-    /* Send player betAmount (amount to call/blind amount).
-       Returned value determines whether a new side pot needs to be made. */ 
-    bool allIn = player->takeBets(betAmount, isForced);
-
-    if (allIn) {
+void GameLogic::takeBlind(unsigned int betAmount, Player *player) {
+    // Returned value determines whether a new side pot needs to be made.
+    if (player->takeBlind(betAmount) == ActionType::AllIn) {
         updateSidePots(player);
-    } 
-    
-    /* Figuring out pot values when there are a bunch of side pots
+    }
+    recalculatePot();
+}
+
+void GameLogic::takeBet(unsigned int betAmount, Player *player) {
+    switch(player->takeBet(betAmount)) {
+        case ActionType::Call:
+        case ActionType::Check:
+            m_playersActionComplete++;
+            break;
+        case ActionType::Fold:
+            m_playersInHand--;
+            break;
+        case ActionType::Raise:
+            m_playersActionComplete = 1;
+            break;
+        default:
+            std::cout << "?!";
+            return;
+    }
+
+    if (player->m_stack == 0) {
+        updateSidePots(player);
+    }
+    recalculatePot();
+}
+
+void GameLogic::recalculatePot() {
+   /* Figuring out pot values when there are a bunch of side pots
        is kind of a pain. There are a lot of edge cases. It is much
        easier to just recalculate the pots after each bet. */
     unsigned int lastMaxPotValue = 0;

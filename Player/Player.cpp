@@ -8,19 +8,21 @@ Player::Player(int playerIndex, CommonVariables *variables) {
     m_variables = variables;
 }
 
-ActionType Player::takeBets(unsigned int amount, bool isForced) {
-    // If it is not a forced bet (such as a blind), poll the player
-    PlayerAction action = {ActionType::Blind, amount};
-    if (!isForced) {
-        action = pollPlayer(amount);
-    }
-
-    // go all in if player tries to bet more than they have
-    if (action.betAmount >= m_stack) {
+ActionType Player::takeBlind(unsigned int amount) {
+    if (amount >= m_stack) {
         m_contributionToCurrentHand += m_stack;
         m_stack = 0;
         return ActionType::AllIn;
     }
+
+    m_contributionToCurrentHand += amount;
+    m_stack -= amount;
+    return ActionType::Blind;
+}
+
+ActionType Player::takeBet(unsigned int amountToCall) {
+    PlayerAction action = {ActionType::Blind, amountToCall};
+    action = pollPlayer(amountToCall);
 
     m_contributionToCurrentHand += action.betAmount;
     m_stack -= action.betAmount;
@@ -37,11 +39,16 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
         std::cin >> input;
         ActionType action = getActionType(input, valid);
         switch (action) {
-            case Call:
+            case ActionType::Call:
                 returnVal.action = ActionType::Call;
-                returnVal.betAmount = amountToCall;
+                // If the user calls, ensure they at most go all in.
+                if (amountToCall > m_stack) {
+                    returnVal.betAmount = m_stack;
+                } else {
+                    returnVal.betAmount = amountToCall;
+                }
                 return returnVal;
-            case Raise:
+            case ActionType::Raise:
                 unsigned int raiseAmount;
                 std::cin >> raiseAmount;
                 /* Throw an error if the amount to be called + the raise amount is bigger
@@ -55,18 +62,27 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
                 } else {
                     returnVal.action = ActionType::Raise;
                     returnVal.betAmount = raiseAmount + amountToCall;
+                    m_variables->minimumRaiseAmount = returnVal.betAmount;
                     return returnVal;
                 }
-            case AllIn:
-                returnVal.action = ActionType::AllIn;
+            // AllIn is not a handled action by the game logic, only an option for players.
+            case ActionType::AllIn:
+                /* Don't allow further action in the turn if the user goes all in for
+                   less than minimum raise amount. */
+                if (m_stack < amountToCall + m_variables->minimumRaiseAmount) {
+                    returnVal.action = ActionType::Call;
+                } else {
+                    m_variables->minimumRaiseAmount = returnVal.betAmount;
+                    returnVal.action = ActionType::Raise;
+                }
                 returnVal.betAmount = m_stack;
                 return returnVal;
-            case Fold:
+            case ActionType::Fold:
                 returnVal.action = ActionType::Fold;
                 returnVal.betAmount = 0;
                 m_isFolded = true;
                 return returnVal;
-            case Check:
+            case ActionType::Check:
                 returnVal.action = ActionType::Check;
                 returnVal.betAmount = 0;
                 return returnVal;
@@ -80,11 +96,10 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
 ValidActions Player::getValidActions(unsigned int amountToCall) {
     ValidActions returnVal = {false, false, false};
 
-    // Make conditionals >=, if = the takeBets function will return the AllIn action
     if (amountToCall == 0) {
         returnVal.canCheck = true;
     } else {
-        returnVal.canCall = (m_stack >= amountToCall);
+        returnVal.canCall = true;
     }
     returnVal.canRaise = (m_stack >= m_variables->minimumRaiseAmount);
     return returnVal;
@@ -106,17 +121,17 @@ void Player::printValidActions(ValidActions valid, unsigned int amountToCall) {
 
 ActionType Player::getActionType(std::string input, ValidActions valid) {
     if (input == "call" && valid.canCall) {
-        return Call;
+        return ActionType::Call;
     } else if (input == "raise" && valid.canRaise) {
-        return Raise;
+        return ActionType::Raise;
     } else if (input == "allIn") {
-        return AllIn;
+        return ActionType::AllIn;
     } else if (input == "fold") {
-        return Fold;
+        return ActionType::Fold;
     } else if (input == "check" && valid.canCheck) {
-        return Check;
+        return ActionType::Check;
     } else {
         // don't poll player on blind, so treat as default action
-        return Blind;
+        return ActionType::Blind;
     }
 }

@@ -18,7 +18,8 @@ class Player {
 public:
     Player(int playerIndex, CommonVariables *variables);
 
-    ActionType takeBets(unsigned int amount, bool isForced);
+    ActionType takeBlind(unsigned int amount);
+    ActionType takeBet(unsigned int amountToCall);
 
     Player *m_nextPlayer;
     int m_playerIndex;
