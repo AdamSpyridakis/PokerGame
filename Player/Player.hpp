@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Common/CommonTypes.hpp"
+#include "../Common/Logging.hpp"
 #include <iostream>
 
 struct PlayerAction {

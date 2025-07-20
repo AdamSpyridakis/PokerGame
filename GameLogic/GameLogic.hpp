@@ -2,8 +2,10 @@
 
 #include "../Player/Player.hpp"
 #include "../Dealer/Dealer.hpp"
+#include "../Common/Logging.hpp"
 
 #include <vector>
+#include <format>
 
 struct Pot {
     unsigned int amount;

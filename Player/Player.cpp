@@ -1,8 +1,10 @@
 #include "Player.hpp"
 
+static const std::string LOG_TAG = "GameLogic";
+
 Player::Player(int playerIndex, CommonVariables *variables) {
     m_playerIndex = playerIndex;
-    std::cout << "Player " << m_playerIndex << " enter your name: ";
+    logEssential(std::format("Player {} enter your name: ", m_playerIndex));
     std::cin >> m_playerName;
 
     m_variables = variables;
@@ -56,10 +58,10 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
                 /* Throw an error if the amount to be called + the raise amount is bigger
                 than the player's stack. Or if the player is trying to raise less than */
                 if (raiseAmount + amountToCall > m_stack) {
-                    std::cout << "Not enough chips!";
+                    logError(LOG_TAG, "Not enough chips!");
                     break;
                 } else if (raiseAmount < m_variables->minimumRaiseAmount) {
-                    std::cout << "Minimum raise amount is " << m_variables->minimumRaiseAmount << "!";
+                    logError(LOG_TAG, std::format("Minimum raise amount is {}!", m_variables->minimumRaiseAmount));
                     break;
                 } else {
                     returnVal.action = ActionType::Raise;
@@ -89,7 +91,7 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
                 returnVal.betAmount = 0;
                 return returnVal;
             default:
-                std::cout << "????\n";
+                logError(LOG_TAG, "Invalid action type!");
                 break;
         }
     }
@@ -108,17 +110,17 @@ ValidActions Player::getValidActions(unsigned int amountToCall) {
 }
 
 void Player::printValidActions(ValidActions valid, unsigned int amountToCall) {
-    std::cout << "Player " << m_playerIndex << " your action!\n";
-    std::cout << "Type fold to fold.\n";
-    std::cout << "Type allIn to go all in.\n";
+    logEssential(std::format("Player {} it is your action!", m_playerIndex));
+    logEssential("Type fold to fold.");
+    logEssential("Type allIn to go all in.");
     if (valid.canCall) {
-        std::cout << "Type call to call " << amountToCall << ".\n";
+        logEssential(std::format("Type call to call {}.", amountToCall));
     }
     if (valid.canRaise) {
-        std::cout << "Type raise and a number to raise. Minimum raise: " << m_variables->minimumRaiseAmount << ".\n";
+        logEssential(std::format("Type raise and a number to raise. Minimum raise: {}", m_variables->minimumRaiseAmount));
     }
     if (valid.canCheck) {
-        std::cout << "Type check to check.\n";
+        logEssential("Type check to check.");
     }
 }
 

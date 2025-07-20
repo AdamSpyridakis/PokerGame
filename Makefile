@@ -1,9 +1,10 @@
 CXX = g++
-CXXFLAGS = -std=c++11
+CXXFLAGS = -std=c++23
 
 SRCS = main.cpp 
-SRCS += Dealer\dealer.cpp
-SRCS += Common\commonTypes.cpp
+SRCS += Dealer\Dealer.cpp
+SRCS += Common\CommonTypes.cpp
+SRCS += Common\Logging.cpp
 SRCS += GameLogic\GameLogic.cpp
 SRCS += Player\Player.cpp
 

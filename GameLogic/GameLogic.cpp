@@ -1,6 +1,9 @@
 #include "GameLogic.hpp"
 
+static const std::string LOG_TAG = "GameLogic";
+
 GameLogic::GameLogic(int numPlayers) {
+    logDebug(LOG_TAG, "Setting up GameLogic dependencies.");
     m_dealer = new Dealer;
 
     m_variables = new CommonVariables;
@@ -14,6 +17,7 @@ GameLogic::GameLogic(int numPlayers) {
 
     m_buttonPlayer = m_players[0];
 
+    logDebug(LOG_TAG, "Starting game.");
     startGame();
 }
 
@@ -58,16 +62,20 @@ void GameLogic::setupLinkedList() {
 void GameLogic::startGame() {
     // Linked list for turn order - players involved in a hand
     setupLinkedList();
+    logDebug(LOG_TAG, std::format("Set up linked list! {} players in hand.", m_playersInHand));
 
     dealPlayerHands();
+    logDebug(LOG_TAG, "Dealt players' hands.");
 
     printPlayers();
 
     takeInitialBets();
+    logDebug(LOG_TAG, "Took blinds.");
 
     printPot();
 
     // pre-flop betting
+    logDebug(LOG_TAG, "Starting pre-flop betting");
     startBettingRound();
 
     printPot();
@@ -135,7 +143,7 @@ unsigned int GameLogic::takeBet(unsigned int maxCallAmount, Player *player) {
             maxCallAmount = player->m_contributionToBettingRound;
             break;
         default:
-            std::cout << "shouldn't get here.....";
+            logError(LOG_TAG, "Invalid action.");
             return 0;
     }
 
@@ -149,8 +157,8 @@ unsigned int GameLogic::takeBet(unsigned int maxCallAmount, Player *player) {
 
 void GameLogic::recalculatePot() {
    /* Figuring out pot values when there are a bunch of side pots
-       is kind of a pain. There are a lot of edge cases. It is much
-       easier to just recalculate the pots after each bet. */
+      is kind of a pain. There are a lot of edge cases. It is much
+      easier to just recalculate the pots after each bet. */
     unsigned int lastMaxPotValue = 0;
 
     for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {
@@ -193,19 +201,20 @@ void GameLogic::updateSidePots(Player *player) {
 
 void GameLogic::printPlayers() {
     for (auto player : m_players) {
-        std::cout << player->m_playerName << " " << player->m_stack << "\n";
-        std::cout << toStrHand(player->m_playerHand) << "\n\n";
+        logInfo(LOG_TAG, std::format("{}'s stack: {} {}'s hand: {}",  
+                                     player->m_playerName, player->m_stack, 
+                                     player->m_playerName, toStrHand(player->m_playerHand)));
     }
 }
 
 void GameLogic::printPot() {
     for (auto pots : m_pot) {
-        std::cout << "Max bet: " << pots.maxBet << "\n";
-        std::cout << "Amount: " << pots.amount << "\n";
-        std::cout << "Players Included: ";
+        std::string playerString;
         for (auto players : pots.players) {
-            std::cout << players->m_playerName << " ";
+            playerString += players->m_playerName;
+            playerString += " ";
         }
-        std::cout << "\n\n";
+        logInfo(LOG_TAG, std::format("Max bet: {} Amount: {}, Players Included: {}",
+                                     pots.maxBet, pots.amount, playerString));
     }
 }
