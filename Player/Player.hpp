@@ -2,7 +2,9 @@
 
 #include "../Common/CommonTypes.hpp"
 #include "../Common/Logging.hpp"
+
 #include <iostream>
+#include <format>
 
 struct PlayerAction {
     ActionType action;
