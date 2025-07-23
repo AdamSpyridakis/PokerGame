@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <format>
+#include <memory>
 
 struct Pot {
     unsigned int amount;
@@ -22,6 +23,7 @@ private:
     void startGame();
     void setupLinkedList();
     void dealPlayerHands();
+    void dealFlop();
     void takeInitialBets();
     void startBettingRound();
 
@@ -30,11 +32,18 @@ private:
     unsigned int takeBet(unsigned int maxCallAmount, Player *player);
     void updateSidePots(Player *player);
 
-    Dealer *m_dealer;
+    std::unique_ptr<Dealer> m_dealer;
     std::vector<Player *> m_players;
     int m_numPlayers;
     Player *m_buttonPlayer;
 
+    Card *m_board;
+
+    struct Pot {
+        unsigned int amount;
+        unsigned int maxBet;
+        std::vector<Player *> players;
+    };
     std::vector<Pot> m_pot;
     unsigned int m_maxPot;
 
@@ -42,7 +51,7 @@ private:
     unsigned int m_smallBlind = startingSmallBlind;
 
     // Round specific variables
-    CommonVariables *m_variables;
+    std::shared_ptr<CommonVariables> m_variables;
     unsigned int m_minimumRaise = m_bigBlind;
     int m_playersInHand;
     int m_playersActionComplete;

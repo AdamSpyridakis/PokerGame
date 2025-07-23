@@ -10,6 +10,7 @@ public:
     ~Dealer();
 
     Hand dealPlayerHand();
+    Card dealCard();
 
 private:
     void initDeck();

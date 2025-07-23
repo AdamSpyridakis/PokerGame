@@ -4,9 +4,11 @@ static const std::string LOG_TAG = "GameLogic";
 
 GameLogic::GameLogic(int numPlayers) {
     logDebug(LOG_TAG, "Setting up GameLogic dependencies.");
-    m_dealer = new Dealer;
+    m_dealer = std::make_unique<Dealer>();
 
-    m_variables = new CommonVariables;
+    m_variables = std::make_shared<CommonVariables>();
+
+    m_board = new Card[5];
 
     for (int i = 0; i < numPlayers; ++i) {
         m_players.push_back(new Player(i, m_variables));
@@ -22,7 +24,7 @@ GameLogic::GameLogic(int numPlayers) {
 }
 
 GameLogic::~GameLogic() {
-    delete m_dealer;
+    delete[] m_board;
 
     for (auto player : m_players) {
         delete player;
@@ -78,6 +80,8 @@ void GameLogic::startGame() {
     logDebug(LOG_TAG, "Starting pre-flop betting");
     startBettingRound();
 
+    dealFlop();
+
     printPot();
     printPlayers();
 }
@@ -86,6 +90,12 @@ void GameLogic::dealPlayerHands() {
     for (int i = 0; i < m_numPlayers; ++i) {
         m_players[i]->m_playerHand = m_dealer->dealPlayerHand();
     }
+}
+
+void GameLogic::dealFlop() {
+    m_board[0] = m_dealer->dealCard();
+    m_board[1] = m_dealer->dealCard();
+    m_board[2] = m_dealer->dealCard();
 }
 
 void GameLogic::takeInitialBets() {

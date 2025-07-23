@@ -2,7 +2,7 @@
 
 static const std::string LOG_TAG = "GameLogic";
 
-Player::Player(int playerIndex, CommonVariables *variables) {
+Player::Player(int playerIndex, std::shared_ptr<CommonVariables> variables) {
     m_playerIndex = playerIndex;
     logEssential(std::format("Player {} enter your name: ", m_playerIndex));
     std::cin >> m_playerName;
@@ -34,7 +34,7 @@ ActionType Player::takeBet(unsigned int amountToCall) {
     return action.action;
 }
 
-PlayerAction Player::pollPlayer(unsigned int amountToCall) {
+Player::PlayerAction Player::pollPlayer(unsigned int amountToCall) {
     ValidActions valid = getValidActions(amountToCall);
     PlayerAction returnVal = {};
     while (true) {
@@ -73,13 +73,13 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
             case ActionType::AllIn:
                 /* Don't allow further action in the turn if the user goes all in for
                    less than minimum raise amount. */
+                returnVal.betAmount = m_stack;
                 if (m_stack < amountToCall + m_variables->minimumRaiseAmount) {
                     returnVal.action = ActionType::Call;
                 } else {
                     m_variables->minimumRaiseAmount = returnVal.betAmount;
                     returnVal.action = ActionType::Raise;
                 }
-                returnVal.betAmount = m_stack;
                 return returnVal;
             case ActionType::Fold:
                 returnVal.action = ActionType::Fold;
@@ -97,7 +97,7 @@ PlayerAction Player::pollPlayer(unsigned int amountToCall) {
     }
 }
 
-ValidActions Player::getValidActions(unsigned int amountToCall) {
+Player::ValidActions Player::getValidActions(unsigned int amountToCall) {
     ValidActions returnVal = {false, false, false};
 
     if (amountToCall == 0) {

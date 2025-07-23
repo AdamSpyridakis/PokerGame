@@ -3,23 +3,12 @@
 #include "../Common/CommonTypes.hpp"
 #include "../Common/Logging.hpp"
 
-#include <iostream>
 #include <format>
-
-struct PlayerAction {
-    ActionType action;
-    unsigned int betAmount;
-};
-
-struct ValidActions {
-    bool canCall;
-    bool canRaise;
-    bool canCheck;
-};
+#include <memory>
 
 class Player {
 public:
-    Player(int playerIndex, CommonVariables *variables);
+    Player(int playerIndex, std::shared_ptr<CommonVariables> variables);
 
     ActionType takeBlind(unsigned int amount);
     ActionType takeBet(unsigned int amountToCall);
@@ -35,9 +24,20 @@ public:
     unsigned int m_contributionToBettingRound = 0;
 
 private:
+    struct PlayerAction {
+        ActionType action;
+        unsigned int betAmount;
+    };
+
+    struct ValidActions {
+        bool canCall;
+        bool canRaise;
+        bool canCheck;
+    };
+
     ValidActions getValidActions(unsigned int amountToCall);
     void printValidActions(ValidActions valid, unsigned int amountToCall);
     PlayerAction pollPlayer(unsigned int amountToCall);
     ActionType getActionType(std::string input, ValidActions valid);
-    CommonVariables *m_variables;
+    std::shared_ptr<CommonVariables> m_variables;
 };

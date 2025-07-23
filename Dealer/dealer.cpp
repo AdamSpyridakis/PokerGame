@@ -15,6 +15,12 @@ Hand Dealer::dealPlayerHand() {
     return playerHand;
 }
 
+Card Dealer::dealCard() {
+    Card card = m_deck[deckIndex];
+    deckIndex++;
+    return card;
+}
+
 void Dealer::initDeck() {
     m_deck = new Card[52];
     for (int i = Suit::Diamonds; i <= Suit::Spades; ++i) {
