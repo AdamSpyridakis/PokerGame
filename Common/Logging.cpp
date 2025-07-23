@@ -6,7 +6,7 @@ enum LogLevel {
     Error
 };
 
-static const LogLevel g_logLevel = Debug;
+static const LogLevel g_logLevel = Info;
 
 void logError(std::string tag, std::string log) {
     switch (g_logLevel) {

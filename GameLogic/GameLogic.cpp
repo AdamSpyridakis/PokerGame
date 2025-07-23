@@ -195,6 +195,7 @@ void GameLogic::updateSidePots(Player *player) {
             // Make a new pot, amount and players will be calculated after
             Pot newPot = {0, maxBetNewSidePot, };
             m_pot.insert(it, newPot);
+            break;
         }
     }
 }

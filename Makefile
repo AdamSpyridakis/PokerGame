@@ -16,7 +16,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
+	del $(OBJS)
 
 clean:
-	del $(OBJS)
 	del PokerBot.exe
