@@ -8,12 +8,6 @@
 #include <format>
 #include <memory>
 
-struct Pot {
-    unsigned int amount;
-    unsigned int maxBet;
-    std::vector<Player *> players;
-};
-
 class GameLogic {
 public:
     GameLogic(int numPlayers);
@@ -24,12 +18,14 @@ private:
     void setupLinkedList();
     void dealPlayerHands();
     void dealFlop();
-    void takeInitialBets();
-    void startBettingRound();
+    void startPreFlopBetting();
+    void startPostFlopBetting();
+    void startBettingRound(Player *currentBettingPlayer, int maxContribution);
+    void cleanUpBettingRound();
 
     void recalculatePot();
     void takeBlind(unsigned int blindAmount, Player *player);
-    unsigned int takeBet(unsigned int maxCallAmount, Player *player);
+    unsigned int takeBet(unsigned int maxContibution, Player *player);
     void updateSidePots(Player *player);
 
     std::unique_ptr<Dealer> m_dealer;
@@ -38,6 +34,7 @@ private:
     Player *m_buttonPlayer;
 
     Card *m_board;
+    int m_cardsDealt;
 
     struct Pot {
         unsigned int amount;
@@ -58,4 +55,5 @@ private:
 
     void printPlayers();
     void printPot();
+    void printBoard();
 };

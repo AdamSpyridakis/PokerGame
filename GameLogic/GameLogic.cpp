@@ -71,16 +71,17 @@ void GameLogic::startGame() {
 
     printPlayers();
 
-    takeInitialBets();
-    logDebug(LOG_TAG, "Took blinds.");
-
-    printPot();
-
     // pre-flop betting
     logDebug(LOG_TAG, "Starting pre-flop betting");
-    startBettingRound();
+    startPreFlopBetting();
+
+    printPot();
+    printPlayers();
 
     dealFlop();
+    printBoard();
+
+    startPostFlopBetting();
 
     printPot();
     printPlayers();
@@ -96,9 +97,10 @@ void GameLogic::dealFlop() {
     m_board[0] = m_dealer->dealCard();
     m_board[1] = m_dealer->dealCard();
     m_board[2] = m_dealer->dealCard();
+    m_cardsDealt = 3;
 }
 
-void GameLogic::takeInitialBets() {
+void GameLogic::startPreFlopBetting() {
     /* Have a vector of pots in case someone goes all in and a side pot is needed.
        Initial pot has no limit and no players involved in it. */
     m_pot.push_back({0, m_maxPot, std::vector<Player *>{}});
@@ -109,21 +111,55 @@ void GameLogic::takeInitialBets() {
     takeBlind(m_smallBlind, smallBlindPlayer);
     takeBlind(m_bigBlind, bigBlindPlayer);
     m_variables->minimumRaiseAmount = m_bigBlind;
-}
 
-void GameLogic::startBettingRound() {
-    // Keeps track of maximum call amount (if someone has put in nothing)
-    unsigned int maximumCallAmount = m_bigBlind;
+    unsigned int maxContribution = m_bigBlind;
 
     Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer->m_nextPlayer->m_nextPlayer;
-    m_playersActionComplete = 1;
+    m_playersActionComplete = 0;
+
+    startBettingRound(currentBettingPlayer, maxContribution);
+    cleanUpBettingRound();
+}
+
+void GameLogic::startPostFlopBetting() {
+    // There's no point in starting a betting round if there's one or 0 players left.
+    if (m_playersInHand <= 1) {
+        return;
+    }
+
+    Player *currentBettingPlayer = m_buttonPlayer->m_nextPlayer;
+    while (currentBettingPlayer != m_buttonPlayer) {
+        if (currentBettingPlayer->m_isFolded || currentBettingPlayer->m_stack == 0) {
+            currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
+            continue;
+        }
+        break;
+    }
+
+    m_variables->minimumRaiseAmount = 0;
+    m_playersActionComplete = 0;
+    unsigned int maxContribution = 0;
+
+    startBettingRound(currentBettingPlayer, maxContribution);
+}
+
+void GameLogic::startBettingRound(Player *currentBettingPlayer, int maxContribution) {
     while (m_playersActionComplete != m_playersInHand) {
         if(currentBettingPlayer->m_isFolded) {
             currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
             continue;
         }
-        maximumCallAmount = takeBet(maximumCallAmount, currentBettingPlayer);
+        maxContribution = takeBet(maxContribution, currentBettingPlayer);
         currentBettingPlayer = currentBettingPlayer->m_nextPlayer;
+    }
+}
+
+void GameLogic::cleanUpBettingRound() {
+    m_buttonPlayer->m_contributionToBettingRound = 0;
+    Player *iter = m_buttonPlayer->m_nextPlayer;
+    while (iter != m_buttonPlayer) {
+        iter->m_contributionToBettingRound = 0;
+        iter = iter->m_nextPlayer;
     }
 }
 
@@ -135,8 +171,8 @@ void GameLogic::takeBlind(unsigned int blindAmount, Player *player) {
     recalculatePot();
 }
 
-unsigned int GameLogic::takeBet(unsigned int maxCallAmount, Player *player) {
-    int amountToCall = maxCallAmount - player->m_contributionToBettingRound;
+unsigned int GameLogic::takeBet(unsigned int maxContribution, Player *player) {
+    int amountToCall = maxContribution - player->m_contributionToBettingRound;
     ActionType action = player->takeBet(amountToCall);
     switch(action) {
         case ActionType::Call:
@@ -148,9 +184,8 @@ unsigned int GameLogic::takeBet(unsigned int maxCallAmount, Player *player) {
             break;
         case ActionType::Raise:
             m_playersActionComplete = 1;
-            /* If a player made a valid raise, this will be the new call amount
-               for other players. */
-            maxCallAmount = player->m_contributionToBettingRound;
+            /* If a player made a valid raise, this will be the new max contribution. */
+            maxContribution = player->m_contributionToBettingRound;
             break;
         default:
             logError(LOG_TAG, "Invalid action.");
@@ -158,11 +193,13 @@ unsigned int GameLogic::takeBet(unsigned int maxCallAmount, Player *player) {
     }
 
     if (player->m_stack == 0) {
+        m_playersInHand--;
+        m_playersActionComplete--;
         updateSidePots(player);
     }
     recalculatePot();
 
-    return maxCallAmount;
+    return maxContribution;
 }
 
 void GameLogic::recalculatePot() {
@@ -227,5 +264,13 @@ void GameLogic::printPot() {
         }
         logInfo(LOG_TAG, std::format("Max bet: {} Amount: {}, Players Included: {}",
                                      pots.maxBet, pots.amount, playerString));
+    }
+}
+
+void GameLogic::printBoard() {
+    for (int i = 0; i < 5; i++) {
+        if (i < m_cardsDealt) {
+            logInfo(LOG_TAG, std::format("Board card #{}: {}", i, toStrCard(m_board[i])));
+        }
     }
 }
