@@ -6,6 +6,7 @@ SRCS += Dealer\Dealer.cpp
 SRCS += Common\CommonTypes.cpp
 SRCS += Common\Logging.cpp
 SRCS += GameLogic\GameLogic.cpp
+SRCS += GameLogic\HandCalculator.cpp
 SRCS += Player\Player.cpp
 
 OBJS = $(SRCS:.cpp=.o)
