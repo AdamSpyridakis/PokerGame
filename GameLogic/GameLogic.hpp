@@ -18,6 +18,8 @@ private:
     void setupLinkedList();
     void dealPlayerHands();
     void dealFlop();
+    void dealTurn();
+    void dealRiver();
     void startPreFlopBetting();
     void startPostFlopBetting();
     void startBettingRound(Player *currentBettingPlayer, int maxContribution);

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 const unsigned int startingStack = 1000;
 const unsigned int startingBigBlind = 2;
@@ -9,6 +10,7 @@ const unsigned int startingSmallBlind = 1;
 
 struct CommonVariables {
     unsigned int minimumRaiseAmount;
+    std::set<std::string> nameSet;
 };
 
 enum class ActionType {

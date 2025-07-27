@@ -2,6 +2,7 @@
 
 #include "../Common/commonTypes.hpp"
 #include "../Player/Player.hpp"
+
 #include <random>
 
 class Dealer {

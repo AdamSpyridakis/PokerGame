@@ -4,10 +4,16 @@ static const std::string LOG_TAG = "GameLogic";
 
 Player::Player(int playerIndex, std::shared_ptr<CommonVariables> variables) {
     m_playerIndex = playerIndex;
+    m_variables = variables;
+
     logEssential(std::format("Player {} enter your name: ", m_playerIndex));
     std::cin >> m_playerName;
-
-    m_variables = variables;
+    while (m_variables->nameSet.contains(m_playerName)) {
+        logError(LOG_TAG, "Name already in use! Enter a new name.");
+        logEssential(std::format("Player {} enter your name: ", m_playerIndex));
+        std::cin >> m_playerName;
+    }
+    m_variables->nameSet.insert(m_playerName);
 }
 
 ActionType Player::takeBlind(unsigned int amount) {

@@ -80,7 +80,14 @@ void GameLogic::startGame() {
 
     dealFlop();
     printBoard();
+    startPostFlopBetting();
 
+    dealTurn();
+    printBoard();
+    startPostFlopBetting();
+
+    dealRiver();
+    printBoard();
     startPostFlopBetting();
 
     printPot();
@@ -98,6 +105,16 @@ void GameLogic::dealFlop() {
     m_board[1] = m_dealer->dealCard();
     m_board[2] = m_dealer->dealCard();
     m_cardsDealt = 3;
+}
+
+void GameLogic::dealTurn() {
+    m_board[3] = m_dealer->dealCard();
+    m_cardsDealt = 4;
+}
+
+void GameLogic::dealRiver() {
+    m_board[4] = m_dealer->dealCard();
+    m_cardsDealt = 5;
 }
 
 void GameLogic::startPreFlopBetting() {
@@ -141,6 +158,7 @@ void GameLogic::startPostFlopBetting() {
     unsigned int maxContribution = 0;
 
     startBettingRound(currentBettingPlayer, maxContribution);
+    cleanUpBettingRound();
 }
 
 void GameLogic::startBettingRound(Player *currentBettingPlayer, int maxContribution) {
@@ -155,12 +173,11 @@ void GameLogic::startBettingRound(Player *currentBettingPlayer, int maxContribut
 }
 
 void GameLogic::cleanUpBettingRound() {
-    m_buttonPlayer->m_contributionToBettingRound = 0;
-    Player *iter = m_buttonPlayer->m_nextPlayer;
-    while (iter != m_buttonPlayer) {
+    Player* iter = m_buttonPlayer;
+    do {
         iter->m_contributionToBettingRound = 0;
         iter = iter->m_nextPlayer;
-    }
+    } while (iter != m_buttonPlayer);
 }
 
 void GameLogic::takeBlind(unsigned int blindAmount, Player *player) {
