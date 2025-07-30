@@ -18,5 +18,5 @@ private:
     void shuffleDeck();
 
     Card *m_deck;
-    int deckIndex;
+    int m_deckIndex;
 };

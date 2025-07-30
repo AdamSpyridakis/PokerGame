@@ -30,7 +30,6 @@ enum Suit {
 };
 
 enum Value {
-    Ace,
     Two,
     Three,
     Four,
@@ -42,7 +41,8 @@ enum Value {
     Ten,
     Jack,
     Queen,
-    King
+    King,
+    Ace
 };
 
 struct Card {

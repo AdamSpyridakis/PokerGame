@@ -17,8 +17,6 @@ std::string toStrSuit(Suit suit) {
 
 std::string toStrValue(Value value) {
     switch (value) {
-        case (Ace):
-            return "Ace";
         case (Two):
             return "Two";
         case (Three):
@@ -43,6 +41,8 @@ std::string toStrValue(Value value) {
             return "Queen";
         case (King):
             return "King";
+        case (Ace):
+            return "Ace";
         default:
             return "";
     };

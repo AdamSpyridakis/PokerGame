@@ -10,7 +10,7 @@ GameLogic::GameLogic(int numPlayers) {
 
     m_board = new Card[5];
 
-    for (int i = 0; i < numPlayers; ++i) {
+    for (int i = 0; i < numPlayers; i++) {
         m_players.push_back(new Player(i, m_variables));
     }
     m_numPlayers = numPlayers;
@@ -38,7 +38,7 @@ void GameLogic::setupLinkedList() {
     int lastPlayerIndex = 0;
 
     // Find first player still in.
-    for (int i = 0; i < m_numPlayers - 1; ++i) {
+    for (int i = 0; i < m_numPlayers - 1; i++) {
         if (m_players[i]->m_stack > 0) {
             firstPlayerIndex = i;
             break;
@@ -49,7 +49,7 @@ void GameLogic::setupLinkedList() {
     m_playersInHand = 1;
 
     // Setup linked list.
-    for (int i = firstPlayerIndex; i < m_numPlayers - 1; ++i) {
+    for (int i = firstPlayerIndex; i < m_numPlayers - 1; i++) {
         if (m_players[i + 1]->m_stack > 0) {
             m_playersInHand++;
             m_players[i]->m_nextPlayer = m_players[i + 1];
@@ -95,7 +95,7 @@ void GameLogic::startGame() {
 }
 
 void GameLogic::dealPlayerHands() {
-    for (int i = 0; i < m_numPlayers; ++i) {
+    for (int i = 0; i < m_numPlayers; i++) {
         m_players[i]->m_playerHand = m_dealer->dealPlayerHand();
     }
 }
@@ -225,10 +225,10 @@ void GameLogic::recalculatePot() {
       easier to just recalculate the pots after each bet. */
     unsigned int lastMaxPotValue = 0;
 
-    for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {
+    for (auto it = m_pot.begin(); it != m_pot.end(); it++) {
         it->amount = 0;
         it->players = std::vector<Player *>{};
-        for (int i = 0; i < m_numPlayers; ++i) {
+        for (int i = 0; i < m_numPlayers; i++) {
             bool contributedToPot = false;
             if (m_players[i]->m_contributionToCurrentHand >= it->maxBet) {
                 it->amount += it->maxBet - lastMaxPotValue;
@@ -251,7 +251,7 @@ void GameLogic::updateSidePots(Player *player) {
     unsigned int maxBetNewSidePot = player->m_contributionToCurrentHand;
 
     // Pots are ordered by size of max bet
-    for (auto it = m_pot.begin(); it != m_pot.end(); ++it) {
+    for (auto it = m_pot.begin(); it != m_pot.end(); it++) {
         if (it->maxBet == maxBetNewSidePot) {
             // We already have a side pot of this size
             break;
