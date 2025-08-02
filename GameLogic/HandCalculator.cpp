@@ -57,7 +57,7 @@ BestHand classifyHand(Hand playerHand, Card board[]) {
     }
 
     sortByValue(cardsAvailable, 0, 6);
-    bestHand = checkForStraight(0, cardsAvailable);
+    bestHand = checkForStraight(0, 6, cardsAvailable);
     if (bestHand.handStrength == Straight) {
         return bestHand;
     }
@@ -190,7 +190,14 @@ BestHand checkForStraightFlush(Suit suit, Card cardsAvailable[]) {
         }
     }
 
-    BestHand bestHand = checkForStraight(startIndex, cardsAvailable);
+    int endIndex = startIndex + 4;
+    for (endIndex; endIndex < 7; endIndex++) {
+        if (cardsAvailable[endIndex + 1].suit != suit) {
+            break;
+        }
+    }
+
+    BestHand bestHand = checkForStraight(startIndex, endIndex, cardsAvailable);
     if (bestHand.handStrength == Straight) {
         if (bestHand.hand[0].value == Ace) {
             bestHand.handStrength = RoyalFlush;
@@ -206,10 +213,10 @@ BestHand checkForStraightFlush(Suit suit, Card cardsAvailable[]) {
     return bestHand;
 }
 
-BestHand checkForStraight(int startIndex, Card cardsAvailable[]) {
+BestHand checkForStraight(int startIndex, int endIndex, Card cardsAvailable[]) {
     BestHand bestHand;
     int cardsInARow = 0;
-    for (int i = startIndex; i < 6; i++) {
+    for (int i = startIndex; i < endIndex; i++) {
         if (cardsAvailable[i].value - cardsAvailable[i + 1].value == 1) {
             bestHand.hand[cardsInARow] = cardsAvailable[i];
             cardsInARow++;

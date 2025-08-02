@@ -40,4 +40,4 @@ BestHand classifyHand(Hand playerHand, Card board[]);
 
 BestHand checkForStraightFlush(Suit suit, Card cardsAvailable[]);
 
-BestHand checkForStraight(int startIndex, Card cardsAvailable[]);
+BestHand checkForStraight(int startIndex, int endIndex, Card cardsAvailable[]);
