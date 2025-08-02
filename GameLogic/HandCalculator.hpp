@@ -39,3 +39,5 @@ void findKicker(int numKickers, std::set<Value> valuesExcluded, Card cardsAvaila
 BestHand classifyHand(Hand playerHand, Card board[]);
 
 BestHand checkForStraightFlush(Suit suit, Card cardsAvailable[]);
+
+BestHand checkForStraight(int startIndex, Card cardsAvailable[]);

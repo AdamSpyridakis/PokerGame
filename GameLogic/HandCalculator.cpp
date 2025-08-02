@@ -44,6 +44,55 @@ BestHand classifyHand(Hand playerHand, Card board[]) {
         std::set<Value> excludedValues = {cardsAvailable[0].value};
         findKicker(1, excludedValues, cardsAvailable, bestHand.hand);
         return bestHand;
+    } else if (mostDuplicates == 3) {
+        if (cardsAvailable[3].value == cardsAvailable[4].value) {
+            bestHand.handStrength = FullHouse;
+            std::copy(cardsAvailable, cardsAvailable + 5, bestHand.hand);
+            return bestHand;
+        }
+    }
+
+    if (bestHand.handStrength == Flush) {
+        return bestHand;
+    }
+
+    sortByValue(cardsAvailable, 0, 6);
+    bestHand = checkForStraight(0, cardsAvailable);
+    if (bestHand.handStrength == Straight) {
+        return bestHand;
+    }
+
+    mostDuplicates = sortByDuplicate(cardsAvailable);
+    std::set<Value> excludedValues = {};
+    switch (mostDuplicates) {
+        case 3:
+            bestHand.handStrength = ThreeOfAKind;
+            std::copy(cardsAvailable, cardsAvailable + 3, bestHand.hand);
+            excludedValues.insert(cardsAvailable[0].value);
+            findKicker(2, excludedValues, cardsAvailable, bestHand.hand);
+            return bestHand;
+        case 2:
+            if (cardsAvailable[2].value == cardsAvailable[1].value) {
+                bestHand.handStrength = TwoPair;
+                std::copy(cardsAvailable, cardsAvailable + 4, bestHand.hand);
+                excludedValues.insert(cardsAvailable[0].value);
+                excludedValues.insert(cardsAvailable[2].value);
+                findKicker(1, excludedValues, cardsAvailable, bestHand.hand);
+            } else {
+                bestHand.handStrength = Pair;
+                std::copy(cardsAvailable, cardsAvailable + 2, bestHand.hand);
+                excludedValues.insert(cardsAvailable[0].value);
+                findKicker(3, excludedValues, cardsAvailable, bestHand.hand);
+            }
+            return bestHand;
+        case 1:
+            bestHand.handStrength = HighCard;
+            findKicker(5, excludedValues, cardsAvailable, bestHand.hand);
+            return bestHand;
+        default:
+            logError(LOG_TAG, "Unexpected state in switch case.");
+            // Getting here is already detrimental, so can return whatever.
+            return bestHand;
     }
 }
 
@@ -141,35 +190,45 @@ BestHand checkForStraightFlush(Suit suit, Card cardsAvailable[]) {
         }
     }
 
-    BestHand bestHand;
-    int cardsInARow = 0;
-    for (int i = startIndex; i < 6; i++) {
-        if (cardsAvailable[i].value - cardsAvailable[i + 1].value == 1) {
-            bestHand.hand[cardsInARow] = {suit, static_cast<Value>(i)};
-            cardsInARow++;
+    BestHand bestHand = checkForStraight(startIndex, cardsAvailable);
+    if (bestHand.handStrength == Straight) {
+        if (bestHand.hand[0].value == Ace) {
+            bestHand.handStrength == RoyalFlush;
         } else {
-            cardsInARow = 0;
+            bestHand.handStrength == StraightFlush;
         }
-        if (cardsInARow == 5) {
-            if (cardsAvailable[i].value == Ten) {
-                bestHand.handStrength = RoyalFlush;
-                return bestHand;
-            } else {
-                bestHand.handStrength = StraightFlush;
-                return bestHand;
-            }
-        }
-    }
-
-    // Check for wheel straight
-    if (cardsInARow == 4 && cardsAvailable[startIndex].value == Ace) {
-        bestHand.hand[5] = {suit, Ace};
-        bestHand.handStrength = StraightFlush;
         return bestHand;
     }
 
     // Populate the flush hand
     bestHand.handStrength = Flush;
     std::copy(cardsAvailable + startIndex, cardsAvailable + startIndex + 5, bestHand.hand);
+    return bestHand;
+}
+
+BestHand checkForStraight(int startIndex, Card cardsAvailable[]) {
+    BestHand bestHand;
+    int cardsInARow = 0;
+    for (int i = startIndex; i < 6; i++) {
+        if (cardsAvailable[i].value - cardsAvailable[i + 1].value == 1) {
+            bestHand.hand[cardsInARow] = cardsAvailable[i];
+            cardsInARow++;
+        } else {
+            cardsInARow = 0;
+        }
+        if (cardsInARow == 5) {
+            bestHand.handStrength = Straight;
+            return bestHand;
+        }
+    }
+
+    // Check for wheel straight
+    if (cardsInARow == 4 && cardsAvailable[startIndex].value == Ace) {
+        bestHand.hand[5] = cardsAvailable[startIndex];
+        bestHand.handStrength = Straight;
+        return bestHand;
+    }
+
+    bestHand.handStrength = HighCard;
     return bestHand;
 }
