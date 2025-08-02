@@ -193,9 +193,9 @@ BestHand checkForStraightFlush(Suit suit, Card cardsAvailable[]) {
     BestHand bestHand = checkForStraight(startIndex, cardsAvailable);
     if (bestHand.handStrength == Straight) {
         if (bestHand.hand[0].value == Ace) {
-            bestHand.handStrength == RoyalFlush;
+            bestHand.handStrength = RoyalFlush;
         } else {
-            bestHand.handStrength == StraightFlush;
+            bestHand.handStrength = StraightFlush;
         }
         return bestHand;
     }
@@ -216,7 +216,8 @@ BestHand checkForStraight(int startIndex, Card cardsAvailable[]) {
         } else {
             cardsInARow = 0;
         }
-        if (cardsInARow == 5) {
+        if (cardsInARow == 4) {
+            bestHand.hand[cardsInARow] = cardsAvailable[i];
             bestHand.handStrength = Straight;
             return bestHand;
         }
