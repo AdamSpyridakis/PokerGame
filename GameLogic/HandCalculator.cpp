@@ -224,15 +224,16 @@ BestHand checkForStraight(int startIndex, int endIndex, Card cardsAvailable[]) {
             cardsInARow = 0;
         }
         if (cardsInARow == 4) {
-            bestHand.hand[cardsInARow] = cardsAvailable[i];
+            bestHand.hand[cardsInARow] = cardsAvailable[i + 1];
             bestHand.handStrength = Straight;
             return bestHand;
         }
     }
 
     // Check for wheel straight
-    if (cardsInARow == 4 && cardsAvailable[startIndex].value == Ace) {
-        bestHand.hand[5] = cardsAvailable[startIndex];
+    if (cardsInARow == 3 && cardsAvailable[startIndex].value == Ace) {
+        bestHand.hand[3] = cardsAvailable[endIndex];
+        bestHand.hand[4] = cardsAvailable[startIndex];
         bestHand.handStrength = Straight;
         return bestHand;
     }
