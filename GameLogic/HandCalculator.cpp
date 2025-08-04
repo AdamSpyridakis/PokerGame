@@ -72,7 +72,7 @@ BestHand classifyHand(Hand playerHand, Card board[]) {
             findKicker(2, excludedValues, cardsAvailable, bestHand.hand);
             return bestHand;
         case 2:
-            if (cardsAvailable[2].value == cardsAvailable[1].value) {
+            if (cardsAvailable[2].value == cardsAvailable[3].value) {
                 bestHand.handStrength = TwoPair;
                 std::copy(cardsAvailable, cardsAvailable + 4, bestHand.hand);
                 excludedValues.insert(cardsAvailable[0].value);
