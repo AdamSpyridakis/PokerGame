@@ -2,13 +2,115 @@
 
 static const std::string LOG_TAG = "Hand Calculator";
 
-int calculateBestHand(int playerIndex[], Hand playerHand[], int size, Card board[]) {
+std::vector<int> calculateBestHand(int playerIndex[], Hand playerHand[], int size, Card board[]) {
     BestHand classifiedHands[size];
     for (int i = 0; i < size; i++) {
         classifiedHands[i] = classifyHand(playerHand[i], board);
     }
 
-    return 0;
+    std::vector<int> winningHands;
+    int numWinningHands = sortByHandProwess(playerIndex, classifiedHands, size);
+    for (int i = 0; i < numWinningHands; i++) {
+        winningHands.push_back(playerIndex[i]);
+    }
+    return winningHands;
+}
+
+int sortByHandProwess(int playerIndex[], BestHand classifiedHands[], int size) {
+    for (int i = 0; i < size - 1; i++) {
+        int strongestHandIndex = i;
+        for (int j = i + 1; j < size; j++) {
+            if (determineIfStronger(classifiedHands[strongestHandIndex], classifiedHands[j]) > 0) {
+                strongestHandIndex = j;
+            }
+        }
+        std::swap(classifiedHands[strongestHandIndex], classifiedHands[i]);
+        std::swap(playerIndex[strongestHandIndex], playerIndex[i]);
+    }
+
+    int numWinningHands = 1;
+    for (int i = 0; i < size - 1; i++) {
+        if (determineIfStronger(classifiedHands[i], classifiedHands[i + 1]) == 2) {
+            numWinningHands++;
+        } else {
+            break;
+        }
+    }
+
+    return numWinningHands;
+}
+
+int determineIfStronger(BestHand firstHand, BestHand secondHand) {
+    int compare = compareEnums(firstHand.handStrength, secondHand.handStrength);
+    if (compare == 1 || compare == 0) {
+        return compare;
+    } else {
+        switch (firstHand.handStrength) {
+            // A few of these are logistically impossible, but having it here for completeness sake.
+            case RoyalFlush:
+                return 2;
+            case StraightFlush:
+            case Straight:
+                return compareEnums(firstHand.hand[0].value, secondHand.hand[0].value);
+            case FullHouse:
+            case FourOfAKind:
+                compare = compareEnums(firstHand.hand[0].value, secondHand.hand[0].value);
+                if (compare == 1 || compare == 0) {
+                    return compare;
+                } else {
+                    return compareEnums(firstHand.hand[4].value, secondHand.hand[4].value);
+                }
+            case Flush:
+            case HighCard:
+                for (int i = 0; i < 5; i++) {
+                    compare = compareEnums(firstHand.hand[i].value, secondHand.hand[i].value);
+                    if (compare != 2) {
+                        return compare;
+                    } 
+                }
+                return 2;
+            case ThreeOfAKind:
+            case TwoPair:
+                compare = compareEnums(firstHand.hand[0].value, secondHand.hand[0].value);
+                if (compare == 1 || compare == 0) {
+                    return compare;
+                } else {
+                    for (int i = 3; i < 5; i++) {
+                        compare = compareEnums(firstHand.hand[i].value, secondHand.hand[i].value);
+                        if (compare != 2) {
+                            return compare;
+                        } 
+                    }
+                    return 2;
+                }
+            case Pair:
+                compare = compareEnums(firstHand.hand[0].value, secondHand.hand[0].value);
+                if (compare == 1 || compare == 0) {
+                    return compare;
+                } else {
+                    for (int i = 2; i < 5; i++) {
+                        compare = compareEnums(firstHand.hand[i].value, secondHand.hand[i].value);
+                        if (compare != 2) {
+                            return compare;
+                        } 
+                    }
+                    return 2;
+                }
+            default:
+                logError(LOG_TAG, "Unexpected state in switch case.");
+                return 0;
+        }
+    }
+}
+
+int compareEnums(int firstInt, int secondInt) {
+    if (firstInt > secondInt) {
+        return 1;
+    } else if (firstInt < secondInt) {
+        return 0;
+    } else {
+        return 2;
+    }
 }
 
 BestHand classifyHand(Hand playerHand, Card board[]) {

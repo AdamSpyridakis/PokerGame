@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <set>
+#include <vector>
 
 enum HandClassification {
     RoyalFlush,
@@ -24,7 +25,16 @@ struct BestHand {
     HandClassification handStrength;
 };
 
-int calculateBestHand(int playerIndex[], Hand playerHand[], int size, Card board[]);
+std::vector<int> calculateBestHand(int playerIndex[], Hand playerHand[], int size, Card board[]);
+
+// Returns number of players with best hand (in case of ties).
+int sortByHandProwess(int playerIndex[], BestHand classifiedHands[], int size);
+
+// Returns 1 if firstHand is stronger, 0 if weaker, 2 if equal.
+int determineIfStronger(BestHand firstHand, BestHand secondHand);
+
+// Returns 1 if firstHInt is greater, 0 if smaller, 2 if equal.
+int compareEnums(int firstInt, int secondInt);
 
 // Returns suit enum value if there is a flush, otherwise -1.
 int sortBySuit(Card cardsAvailable[]);
