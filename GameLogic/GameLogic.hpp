@@ -3,6 +3,7 @@
 #include "../Player/Player.hpp"
 #include "../Dealer/Dealer.hpp"
 #include "../Common/Logging.hpp"
+#include "HandCalculator.hpp"
 
 #include <vector>
 #include <format>
@@ -30,6 +31,8 @@ private:
     unsigned int takeBet(unsigned int maxContibution, Player *player);
     void updateSidePots(Player *player);
 
+    void getResults();
+
     std::unique_ptr<Dealer> m_dealer;
     std::vector<Player *> m_players;
     int m_numPlayers;
@@ -39,7 +42,7 @@ private:
     int m_cardsDealt;
 
     struct Pot {
-        unsigned int amount;
+        unsigned int amount = 0;
         unsigned int maxBet;
         std::vector<Player *> players;
     };

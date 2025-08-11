@@ -90,6 +90,8 @@ void GameLogic::startGame() {
     printBoard();
     startPostFlopBetting();
 
+    getResults();
+
     printPot();
     printPlayers();
 }
@@ -243,6 +245,10 @@ void GameLogic::recalculatePot() {
             }
         }
         lastMaxPotValue = it->maxBet;
+
+        if (it->amount == 0) {
+            m_pot.erase(it);
+        }
     }
 }
 
@@ -260,6 +266,50 @@ void GameLogic::updateSidePots(Player *player) {
             Pot newPot = {0, maxBetNewSidePot, };
             m_pot.insert(it, newPot);
             break;
+        }
+    }
+}
+
+void GameLogic::getResults() {
+    for (auto potIter : m_pot) {
+        logInfo(LOG_TAG, std::format("Calculating pot with max bet {}.", potIter.maxBet));
+        int numPlayers = potIter.players.size();
+        int playerIndices[numPlayers];
+        Hand playerHands[numPlayers];
+        for (int i = 0; i < numPlayers; i++) {
+            playerIndices[i] = potIter.players[i]->m_playerIndex;
+            playerHands[i] = potIter.players[i]->m_playerHand;
+        }
+
+        std::vector<int> winningPlayers = calculateBestHand(playerIndices, playerHands, numPlayers, m_board);
+        int numWinners = winningPlayers.size();
+        unsigned int winningsPerPlayer = potIter.amount / numWinners;
+        unsigned int remainingChips = potIter.amount % numWinners;
+        for (int i = 0; i < numWinners; i++) {
+            logInfo(LOG_TAG, std::format("Player {} won {} chips.", winningPlayers[i], winningsPerPlayer));
+            m_players[winningPlayers[i]]->m_stack += winningsPerPlayer;
+        }
+
+        if (remainingChips != 0) {
+            int playerLeftOfDealerIndex = m_buttonPlayer->m_nextPlayer->m_playerIndex;
+            int playerToGetChips;
+            // Make this value larger than it can be, so it will get overwritten for sure.
+            int lowestDistanceFromDealer = m_playersInHand + 1;
+            // Find where the remaining chips go.
+            for (auto playerIter : potIter.players) {
+                int playerDistanceFromDealer;
+                if (playerIter->m_playerIndex > playerLeftOfDealerIndex) {
+                    playerDistanceFromDealer = playerIter->m_playerIndex - playerLeftOfDealerIndex;
+                } else {
+                    playerDistanceFromDealer = playerLeftOfDealerIndex - playerLeftOfDealerIndex + playerIter->m_playerIndex;
+                }
+
+                if (playerDistanceFromDealer < lowestDistanceFromDealer) {
+                    playerToGetChips = playerIter->m_playerIndex;
+                }
+            }
+            logInfo(LOG_TAG, std::format("Extra {} chips went to {}.", remainingChips, playerToGetChips));
+            m_players[playerToGetChips]->m_stack += remainingChips;
         }
     }
 }
