@@ -17,8 +17,6 @@ GameLogic::GameLogic(int numPlayers) {
 
     m_maxPot = startingStack * m_numPlayers;
 
-    m_buttonPlayer = m_players[0];
-
     logDebug(LOG_TAG, "Starting game.");
     startGame();
 }
@@ -35,10 +33,9 @@ void GameLogic::setupLinkedList() {
     /* As the game goes, players will be eliminated.
        Need to determine who is in to setup turn order */
     int firstPlayerIndex = 0;
-    int lastPlayerIndex = 0;
 
     // Find first player still in.
-    for (int i = 0; i < m_numPlayers - 1; i++) {
+    for (int i = 0; i < m_numPlayers; i++) {
         if (m_players[i]->m_stack > 0) {
             firstPlayerIndex = i;
             break;
@@ -49,24 +46,36 @@ void GameLogic::setupLinkedList() {
     m_playersInHand = 1;
 
     // Setup linked list.
-    for (int i = firstPlayerIndex; i < m_numPlayers - 1; i++) {
-        if (m_players[i + 1]->m_stack > 0) {
+    int previousPlayerIndex = firstPlayerIndex;
+    for (int i = firstPlayerIndex + 1; i < m_numPlayers; i++) {
+        if (m_players[i]->m_stack > 0) {
             m_playersInHand++;
-            m_players[i]->m_nextPlayer = m_players[i + 1];
-            lastPlayerIndex = i + 1;
+            m_players[previousPlayerIndex]->m_nextPlayer = m_players[i];
+            previousPlayerIndex = i;
         }
     }
 
     // Loop back around!
-    m_players[lastPlayerIndex]->m_nextPlayer = m_players[firstPlayerIndex];
+    m_players[previousPlayerIndex]->m_nextPlayer = m_players[firstPlayerIndex];
 }
 
 void GameLogic::startGame() {
+    while (!checkForWinner()) {
+        startRound();
+    }
+
+    logEssential(std::format("Player {} wins!", m_winningPlayer->m_playerIndex));
+}
+
+void GameLogic::startRound() {
+    prepForRound();
+
     // Linked list for turn order - players involved in a hand
     setupLinkedList();
     logDebug(LOG_TAG, std::format("Set up linked list! {} players in hand.", m_playersInHand));
 
     dealPlayerHands();
+
     logDebug(LOG_TAG, "Dealt players' hands.");
 
     printPlayers();
@@ -96,10 +105,31 @@ void GameLogic::startGame() {
     printPlayers();
 }
 
-void GameLogic::dealPlayerHands() {
-    for (int i = 0; i < m_numPlayers; i++) {
-        m_players[i]->m_playerHand = m_dealer->dealPlayerHand();
+void GameLogic::prepForRound() {
+    if (m_buttonPlayer == nullptr) {
+        m_buttonPlayer = m_players[0];
+        return;
     }
+
+    int buttonPlayerIndex = m_buttonPlayer->m_playerIndex;
+    while (true) {
+        buttonPlayerIndex++;
+        if(buttonPlayerIndex > m_numPlayers) {
+            buttonPlayerIndex = 0;
+        }
+        if (m_players[buttonPlayerIndex]->m_stack > 0) {
+            m_buttonPlayer = m_players[buttonPlayerIndex];
+            return;
+        }
+    }
+}
+
+void GameLogic::dealPlayerHands() {
+    Player *iter = m_buttonPlayer;
+    do {
+        iter->m_playerHand = m_dealer->dealPlayerHand();
+        iter = iter->m_nextPlayer;
+    } while (iter != m_buttonPlayer);
 }
 
 void GameLogic::dealFlop() {
@@ -182,6 +212,22 @@ void GameLogic::cleanUpBettingRound() {
     } while (iter != m_buttonPlayer);
 }
 
+bool GameLogic::checkForWinner() {
+    int numPlayers = 0;
+
+    for (int i = 0; i < m_numPlayers; i++) {
+        if (m_players[i]->m_stack > 0) {
+            numPlayers++;
+            m_winningPlayer = m_players[i];
+        }
+        if (numPlayers > 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void GameLogic::takeBlind(unsigned int blindAmount, Player *player) {
     // Returned value determines whether a new side pot needs to be made.
     if (player->takeBlind(blindAmount) == ActionType::AllIn) {
@@ -248,7 +294,10 @@ void GameLogic::recalculatePot() {
 
         if (it->amount == 0) {
             m_pot.erase(it);
-        }
+            if (it == m_pot.end()) {
+                break;
+            }
+        } 
     }
 }
 
@@ -315,11 +364,13 @@ void GameLogic::getResults() {
 }
 
 void GameLogic::printPlayers() {
-    for (auto player : m_players) {
+    Player* iter = m_buttonPlayer;
+    do {
         logInfo(LOG_TAG, std::format("{}'s stack: {} {}'s hand: {}",  
-                                     player->m_playerName, player->m_stack, 
-                                     player->m_playerName, toStrHand(player->m_playerHand)));
-    }
+                                     iter->m_playerName, iter->m_stack, 
+                                     iter->m_playerName, toStrHand(iter->m_playerHand)));
+        iter = iter->m_nextPlayer;
+    } while (iter != m_buttonPlayer);
 }
 
 void GameLogic::printPot() {

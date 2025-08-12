@@ -16,6 +16,8 @@ public:
 
 private:
     void startGame();
+    void startRound();
+    void prepForRound();
     void setupLinkedList();
     void dealPlayerHands();
     void dealFlop();
@@ -25,6 +27,7 @@ private:
     void startPostFlopBetting();
     void startBettingRound(Player *currentBettingPlayer, int maxContribution);
     void cleanUpBettingRound();
+    bool checkForWinner();
 
     void recalculatePot();
     void takeBlind(unsigned int blindAmount, Player *player);
@@ -36,7 +39,9 @@ private:
     std::unique_ptr<Dealer> m_dealer;
     std::vector<Player *> m_players;
     int m_numPlayers;
-    Player *m_buttonPlayer;
+    Player *m_buttonPlayer = nullptr;
+
+    Player *m_winningPlayer;
 
     Card *m_board;
     int m_cardsDealt;
